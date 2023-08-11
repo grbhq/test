@@ -23,5 +23,6 @@ jobs:
         file: ./stealth.min.js
         #asset_name: mything_name
         tag: ${{ github.event.inputs.tag }}
+        release_name: v${{ github.event.inputs.tag }}
         overwrite: true
-        body: "This is my release text"
+        body: "- This is my release text"
