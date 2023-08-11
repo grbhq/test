@@ -15,16 +15,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
-#     - name: Build
-#       run: cargo build --release
       
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./stealth.min.js
-        asset_name: mything_name
-        tag: ${{ github.ref }}
+        #asset_name: mything_name
+        tag: ${{ github.event.inputs.tag }}
         overwrite: true
         body: "This is my release text"
