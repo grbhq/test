@@ -27,7 +27,7 @@ jobs:
       run: |
         if echo "${{ github.event.inputs.tag }}" | grep -P "^(?!v0+(\.0+)*$)v?\d+(\.\d+)+$"; then
           echo "The version is formatted correctly"
-        else:
+        else
           echo "The version is malformed"
           exit 1
         fi
