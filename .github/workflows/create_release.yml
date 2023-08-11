@@ -46,7 +46,7 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: file/*
         file_glob: true
-        #asset_name: mything_name
+        asset_name: mything_name
         tag: ${{ github.event.inputs.tag }}
         release_name: v${{ github.event.inputs.tag }}
         prerelease: false
