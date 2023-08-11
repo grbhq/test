@@ -32,14 +32,14 @@ jobs:
  #         cat ${workflow_name}
 
 
-      - name: Install build tools
-        run: sudo apt-get update && sudo apt-get install -y g++
+#       - name: Install build tools
+#         run: sudo apt-get update && sudo apt-get install -y g++
       
       - name: run bash
         env:
           workflow_name: ${{ github.workflow_ref }}
         run: |
-          echo ${{ github.run_id }}
+          echo ${{ github.run_number }}
           echo ${{ github.workflow_ref }}
           pwd
           cd .github && ls -a
