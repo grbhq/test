@@ -3,9 +3,15 @@ name: tag release
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: '输入tag版本号'
+      forcedtag:
+        description: 'tag标签重复时是否强制覆盖，勾选后自动覆盖，默认关闭'
+        type: boolean
         required: true
+        default: 'false'
+      tag:
+        description: '输入tag版本号，如1.0'
+        required: true
+        default: ''
 
 jobs:
   build:
@@ -14,8 +20,26 @@ jobs:
     permissions: write-all
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       
+    - name: check tag_version
+      run: |
+        if echo "${{ github.event.inputs.tag }}" | grep -P "^(?!v0+(\.0+)*$)v?\d+(\.\d+)+$"; then
+          echo "The version is formatted correctly"
+        else:
+          echo "The version is malformed"
+          exit 1
+        fi
+      
+    - name: forced tag
+      if: ${{ github.event.inputs.forcedtag == 'true' }}
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -f ${{ github.event.inputs.tag }}
+        git push origin -f ${{ github.event.inputs.tag }}
+        
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -24,5 +48,6 @@ jobs:
         #asset_name: mything_name
         tag: ${{ github.event.inputs.tag }}
         release_name: v${{ github.event.inputs.tag }}
+        prerelease: false
         overwrite: true
         body: "- This is my release text"
