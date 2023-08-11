@@ -1,0 +1,38 @@
+name: matrix_ac
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_values:
+        description: '输入需要矩阵的值 (多个值请使用英文逗号隔开 如：ubuntu-latest,macos-latest)'
+        required: true
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    outputs:
+      output_matrix: ${{ steps.set_data.outputs.output_matrix }}
+
+    steps:
+      - name: Set up data
+        id: set_data
+        run: |
+          input="${{ github.event.inputs.input_values }}"
+          output=($(echo "$input" | sed -E 's/\s*,\s*/,/g' | sed -E 's/\s+//g' | sed -E 's/(^,)|(,$)//g' | grep -o '[^,]*'))
+          formatted_output="[\"$(echo "${output[@]}" | sed 's/ /","/g')\"]"
+          echo "output_matrix=$formatted_output" >> $GITHUB_OUTPUT
+
+      - name: Print Array
+        run: echo ${{ steps.set_data.outputs.output_matrix }}
+
+  build:
+    needs: convert
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        lists: ${{ fromJson(needs.convert.outputs.output_matrix) }}
+    
+    steps:
+      - name: Print Matrix Value
+        run: echo "Array ${{ matrix.lists }}"
+
