@@ -50,4 +50,4 @@ jobs:
         release_name: v${{ github.event.inputs.tag }}
         prerelease: false
         overwrite: true
-        body: ./README.md
+        body: ${{ github.event.inputs.tag }}
