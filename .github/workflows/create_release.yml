@@ -50,4 +50,4 @@ jobs:
         release_name: v${{ github.event.inputs.tag }}
         prerelease: false
         overwrite: true
-        body: "- This is my release text"
+        body: ./README.md
