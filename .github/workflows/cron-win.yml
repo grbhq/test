@@ -1,0 +1,28 @@
+name: 'random-cron-windows'
+
+on:
+  schedule:
+    - cron: "11 0,1,6,9,12 */15 * *"
+  # 点击star时触发运行
+  #watch:
+    #types: started
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    # runs-on: ubuntu-latest
+    steps:
+      - name: Random Cron
+        uses: grbhq/random-workflow-cron-test@main
+        with:
+          #ref_branch: main
+          #author: ${{ secrets.AUTHOR }}
+          github_token: ${{ secrets.PAT }}
+          keep_history: true
+          time_zone: "UTC+8"
+          hour_start: 0
+          hour_end: 21
+          interval_count: 7
+          cron_dmw: "*/15 * *"
