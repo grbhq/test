@@ -1,0 +1,49 @@
+name: playwright_test
+
+on:
+  #schedule:
+    #- cron: "21 0 * * *"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      pyfileselect:
+        description: '选择需要运行的py文件'
+        type: choice
+        required: true
+        options: 
+        - playwright_remote9222.py
+        - playwright_locality.py
+        default: 'playwright_remote9222.py'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+           python-version: '3.10'
+           cache: 'pip'
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+
+      - name: Install chromium
+        if: ${{ github.event.inputs.pyfileselect == 'playwright_locality.py' }}
+        run: playwright install --with-deps chromium
+      
+      - name: test
+        if: ${{ github.event.inputs.logLevel }}
+        run: python3 ${{ github.event.inputs.pyfileselect }}
+      
+      - name: test
+        if: ${{ ! github.event.inputs.logLevel }}
+        run: python3 playwright_remote9222.py
