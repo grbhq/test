@@ -2,7 +2,7 @@ name: 'random-cron-windows'
 
 on:
   schedule:
-    - cron: "12 18,22,1,2,5,8,11 */15 * *"
+    - cron: "56 20,22,3,6,10,11 */15 * *"
   # 点击star时触发运行
   #watch:
     #types: started
