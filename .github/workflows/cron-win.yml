@@ -1,0 +1,32 @@
+name: 'random-cron-windows'
+
+on:
+  schedule:
+    - cron: "0 1,5,7,10 */15 * *"
+  # 点击star时触发运行
+  #watch:
+    #types: started
+  # 手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    # runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Random Cron
+        env:
+            PAT: ${{ secrets.PAT }}
+        if: always() && env.PAT
+        uses: grbhq/random-workflow-cron-test@main
+        with:
+          #ref_branch: main
+          #author: ${{ secrets.AUTHOR }}
+          github_token: ${{ secrets.PAT }}  ## 具有workflow权限的PAT密钥 教程https://github.com/grbnb/random-workflow-cron/blob/v2/README.md#troubleshooting
+          keep_history: true
+          time_zone: "UTC+8"
+          hour_start: 0
+          hour_end: 21
+          interval_count: 7
+          cron_dmw: "*/15 * *"
