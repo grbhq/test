@@ -1,0 +1,63 @@
+name: tag release
+
+on:
+  workflow_dispatch:
+    inputs:
+      pushrelease:
+        description: '是否发布release，不勾选不发布，默认发布'
+        type: boolean
+        required: true
+        default: 'true'
+      forcedtag:
+        description: 'tag标签重复时是否强制覆盖，勾选后自动覆盖，默认关闭'
+        type: boolean
+        required: true
+        default: 'false'
+      tag:
+        description: '输入tag版本号，如1.0'
+        required: true
+        default: ''
+
+jobs:
+  build:
+    name: Publish binaries
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: check tag_version
+      if: ${{ github.event.inputs.pushrelease == 'true' }}
+      id: checktag
+      run: |
+        if echo "${{ github.event.inputs.tag }}" | grep -P "^(?!v0+(\.0+)*$)v?\d+(\.\d+)+$"; then
+          echo "The version ${{ github.event.inputs.tag }} is formatted correctly"
+          echo "runnable=true" >> $GITHUB_OUTPUT
+        else
+          echo "The version ${{ github.event.inputs.tag }} is malformed"
+          exit 0
+        fi
+      
+    - name: forced tag
+      if: ${{ github.event.inputs.pushrelease == 'true' && github.event.inputs.forcedtag == 'true' && steps.checktag.outputs.runnable == 'true' }}
+      run: |
+        git config --local user.name "github-actions[bot]"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -f ${{ github.event.inputs.tag }}
+        git push origin -f ${{ github.event.inputs.tag }}
+        
+    - name: Upload binaries to release
+      if: ${{ github.event.inputs.pushrelease == 'true' && steps.checktag.outputs.runnable == 'true' }}
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: file/*
+        file_glob: true  # 多文件上传
+        #asset_name: mything_name
+        tag: ${{ github.event.inputs.tag }}
+        release_name: ${{ github.event.inputs.tag }}
+        prerelease: false
+        overwrite: true
+        body: ${{ github.event.inputs.tag }}
