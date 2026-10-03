@@ -1,0 +1,49 @@
+name: matrix_upload_download
+
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: '请选择是否矩阵工作流'
+        type: boolean
+        required: true
+        default: 'false'
+
+env:
+  WORK_DIR: "test"
+
+jobs:
+  artifact:
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+      - uses: actions/checkout@v3
+    
+      # 打包上传二进制文件到artifact，默认90天有效期
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact-${{ github.run_number }}
+          path: file/
+
+  build:
+    needs: artifact
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.build == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v3
+      
+    # 下载artifact中的所有文件到本地
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact-${{ github.run_number }}
+          path: path/artifact
+
+      - name: Display structure of downloaded files
+        run: |
+          ls -al path/artifact
+          echo "${{ env.WORK_DIR }}"
+
+      
