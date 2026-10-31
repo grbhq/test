@@ -1,0 +1,45 @@
+name: selenium_test
+
+on:
+  #schedule:
+    #- cron: "21 0 * * *"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'   
+        required: true
+        default: 'warning'
+      pyfileselect:
+        description: '选择需要运行的py文件'
+        type: choice
+        required: true
+        options: 
+        - selenium_remote9222.py
+        - selenium_locality.py
+        default: 'selenium_locality.py'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+           python-version: '3.10'
+           cache: 'pip'
+
+      - name: Install requirements
+        run: |
+          pip install -r requirements1.txt
+      
+      - name: test
+        if: ${{ github.event.inputs.logLevel }}
+        run: python3 ${{ github.event.inputs.pyfileselect }}
+      
+      - name: test
+        if: ${{ ! github.event.inputs.logLevel }}
+        run: python3 selenium_locality.py
